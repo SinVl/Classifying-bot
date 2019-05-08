@@ -15,18 +15,9 @@ model = ClassPredictor()
 keys_photo = ["photo_75","photo_130","photo_604"]
 
 def send_prediction_on_photo(user_id, img_path):
-    #chat_id = update.message.chat_id
     print("Got image from {}".format(user_id))
-
-    # получаем информацию о картинке
-    #image = cv2.imread(img_path)
-    #image = cv2.resize(image, (256,256))
-    #image = np.array(image) / 255.0
-    
+   
     class_, prob_ = model.predict(img_path)
-
-    # теперь отправим результат
-    
     vk.messages.send(user_id = event.user_id, message = "Я думаю это - {} и уверен в этом на {:.1f} %".format(class_, prob_), random_id = random.randint(0,1e32))
     print("Sent Answer to user, predicted: {}".format(class_))
 
@@ -55,6 +46,11 @@ if __name__ == '__main__':
                         for key, val in attach['photo'].items():
                             if(key in keys_photo):
                                 url = val
+                        if url == "":
+                            for it in attach['photo']['sizes']:
+                                for key, val in it.items():
+                                    if(key == "url"):
+                                        url = val
                         print(f"Url : {url}")
                         urllib.request.urlretrieve(url, img_path)
                         count_attach+=1
